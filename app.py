@@ -206,12 +206,16 @@ def update_client(client_id):
         middle_name = request.form['middle_name']
         phone_nubmber = request.form['phone_nubmber']
         cursor = mydb.cursor()
-        query = "UPDATE master_list SET first_name = %s, second_name = %s, middle_name = %s, phone_nubmber = %s WHERE id = %s"
+        query = "UPDATE client_list SET first_name = %s, second_name = %s, middle_name = %s, phone_nubmber = %s WHERE id = %s"
         values = (first_name, second_name, middle_name, phone_nubmber, client_id)
         cursor.execute(query, values)
         mydb.commit()
         return redirect('/client_list')
     
+#форма для добавления заказа
+@app.route('/add_order_form')
+def add_order_form():
+    return render_template('add_order_form.html')    
 # список заказов
 @app.route('/order_list')
 def order_list():
@@ -223,17 +227,26 @@ def order_list():
 @app.route('/add_order', methods=['GET','POST'])
 def add_order():
     if request.method == 'GET':
-        return render_template('add_order_form.html')
+        cursor = mydb.cursor()
+        cursor.execute("SELECT * FROM client_list")
+        clients = cursor.fetchall()
+        cursor.execute("SELECT * FROM master_list")
+        masters = cursor.fetchall()
+        cursor.execute("SELECT * FROM order_status")
+        status = cursor.fetchall()
+        return render_template('add_order_form.html', client_list=clients, master_list=masters, order_status=status)
     elif request.method == 'POST':
+        client = request.form['client']
         registration_date = request.form['registration_date']
         problem_description = request.form['problem_description']
         order_completion_date = request.form['order_completion_date']
         the_contractor_of_the_order = request.form['the_contractor_of_the_order']
         order_status = request.form['order_status']
         type_of_repair = request.form['type_of_repair']
+        repair_cost = request.form['repair_cost']
         cursor = mydb.cursor()
-        query = "INSERT INTO order_list (registration_date, problem_description, order_completion_date, the_contractor_of_the_order, order_status, type_of_repair) VALUES (%s, %s, %s, %s, %s, %s)"
-        values = (registration_date, problem_description, order_completion_date, the_contractor_of_the_order, order_status, type_of_repair)
+        query = "INSERT INTO order_list (client, registration_date, problem_description, order_completion_date, the_contractor_of_the_order, order_status, type_of_repair, repair_cost) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        values = (client, registration_date, problem_description, order_completion_date, the_contractor_of_the_order, order_status, type_of_repair, repair_cost)
         cursor.execute(query, values)
         mydb.commit()
         return redirect('/')
@@ -258,22 +271,37 @@ def update_order(order_id):
         value = (order_id,)
         cursor.execute(query, value)
         orders = cursor.fetchone()
+        cursor.execute("SELECT * FROM master_list")
+        masters = cursor.fetchall()
+        cursor.execute("SELECT * FROM order_status")
+        status = cursor.fetchall()
+        cursor.execute("SELECT * FROM client_list")
+        clients = cursor.fetchall()
         # Вывод формы для редактирования информации об устройстве
-        return render_template('update_order_form.html', order_list=orders)
+        return render_template('update_order_form.html', order_list=orders, master_list=masters, order_status=status, client_list=clients)
     elif request.method == 'POST':
         # Обработка отправленной формы с обновленной информацией об устройстве
+        client = request.form['client']
         registration_date = request.form['registration_date']
         problem_description = request.form['problem_description']
         order_completion_date = request.form['order_completion_date']
         the_contractor_of_the_order = request.form['the_contractor_of_the_order']
         order_status = request.form['order_status']
         type_of_repair = request.form['type_of_repair']
+        repair_cost = request.form['repair_cost']
         cursor = mydb.cursor()
-        query = "UPDATE master_list SET registration_date = %s, problem_description = %s, order_completion_date = %s, the_contractor_of_the_order = %s, order_status = %s, type_of_repair = %s WHERE id = %s"
-        values = (registration_date, problem_description, order_completion_date, the_contractor_of_the_order, order_status, type_of_repair, order_id)
+        query = "UPDATE order_list SET client = %s,  registration_date = %s, problem_description = %s, order_completion_date = %s, the_contractor_of_the_order = %s, order_status = %s, type_of_repair = %s, repair_cost = %s WHERE id = %s"
+        values = (client, registration_date, problem_description, order_completion_date, the_contractor_of_the_order, order_status, type_of_repair, order_id, repair_cost)
         cursor.execute(query, values)
         mydb.commit()
         return redirect('/order_list')
    
 if __name__ == '__main__':
     app.run()
+    # сделать отчёт. не совсем понятно что в нем должно быть
+    # на домашней странице заполнение придумать, а то слишком пусто. может-быть слайдер с какими то картинками или псевдо-отзывами...
+    # подумать как будут на сайте представлены связи между таблицами (в голове конечно хорошо всё держать, но по уму бы сделать...)
+    # сделать футер с какой-то контактной информацией может-быть...
+    # стоимость не обновляется в заказе, надо доделать.
+    # может быть список устройств нам не нужен...
+

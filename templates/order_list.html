@@ -7,15 +7,31 @@
 <body background="/static/img/home_img/4.jpg">
     <div class="container container-fluid">
         <h1 class="text-center text-white">Список заказов</h1>
+        <style>
+            div{
+                padding-top: 10px;
+            }
+            h1{
+                padding-top: 5px;
+                background: #198754;
+                width: 1297px;
+                height: 60px;
+                box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.262);
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                backdrop-filter: blur(5%px) drop-shadow(4px 10px 6px rgba(10, 147, 40, 0.747));
+            }
+        </style>
         <table class="table table-success table-bordered border-success">
             <tr>
                 <th>ID</th>
+                <th>Клиент</th>
                 <th>Дата регистрации заказа</th>
                 <th>Описание неисправности</th>
                 <th>Дата выполнения заказа</th>
                 <th>Исполнитель заказа</th>
                 <th>Статус заказа</th>
                 <th>Тип ремонта</th>
+                <th>Стоимость ремонта</th>
                 <th>Редактирование заказа</th>
                 <th>Удаление заказа</th>
             </tr>
@@ -28,6 +44,8 @@
                 <td>{{ order[4] }}</td>
                 <td>{{ order[5] }}</td>
                 <td>{{ order[6] }}</td>
+                <td>{{ order[7] }}</td>
+                <td>{{ order[8] }}</td>
                 <td>
                     <form action="/update_order/{{ order[0] }}">
                         <button type="submit" class="btn btn-success">Редактировать</button>
@@ -41,9 +59,15 @@
             </tr>
             {% endfor %}
         </table>
-        <form action="/add_order">
-        <button class="btn btn-success">Добавить новый заказ</button>
-        </form>
+        <div class="form-group">
+            <form action="/add_order">
+                <button class="btn btn-success">Добавить новый заказ</button>
+            </form>
+        </div>
+
+        <div class="form-group">
+            <a class="btn btn-success" href="/">Назад</a>
+        </div>
     </div>
 </body>
 </html>
